@@ -21,8 +21,24 @@ import io.apiable.monetization.adapter.model.RevenueModel
 
 
 interface PriceWrapper {
+    /** Create a new price with the given data
+     * @param monetizationData
+     * @return BillingPrice
+     * */
     fun create(monetizationData: BillingPriceCreate): BillingPrice
+    /** Retrieve a price with the given integrationId
+     * @param integrationId
+     * @return BillingPrice
+     * */
     fun retrieve(integrationId: String): BillingPrice
+    /** Archive a price with the given integrationId. This will make the price unavailable for new subscriptions.
+     * Old subscriptions will still be billed with the archived price.
+     * @param integrationId
+     * @return BillingPrice
+     * */
     fun archive(integrationId: String): BillingPrice
+    /** Retrieve price by it's lookup key instead of ID
+     * @return List<BillingPrice>
+     * */
     fun retrieveByLookupKey(lookupKey: String): BillingPrice
 }

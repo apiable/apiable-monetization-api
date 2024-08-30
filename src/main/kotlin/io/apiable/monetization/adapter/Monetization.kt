@@ -109,6 +109,10 @@ interface Monetization {
 
     /** Returns a link to the end user billing portal where the end user can view and manage their subscription.
      * Only applicable if the end-user billing portal is relevant for the monetization provider.
+     *
+     * Context: End user clicks on a link to view their subscription details within payment provider.
+     * End user generally only does this when they want to update their billing information.
+     *
      * @param endCustomerProviderId The ID of the end-customer in the monetization provider.
      * @param subscriptionIntegrationId The ID of the subscription in the monetization provider.
      * @return The URL to the billing portal.
@@ -117,13 +121,26 @@ interface Monetization {
 
     /** Creates configuration for the end-user billing portal.
      * Only applicable if the end-user billing portal is relevant for the monetization provider.
-     * @param endCustomerProviderId The ID of the end-customer in the monetization provider.
+     *
+     * Context: TODO: Set up during initial integration
+     * Set's up the billing portal for the end user by providing the privacy policy and terms of service URLs.
+     *
+     * @param privacyPolicyUrl The URL to the privacy policy of the service.
+     * @param tosUrl The URL to the terms of service of the service.
+     *
      * @return The URL to the billing portal.
+     * @see getEndCustomerBillingPortalLink
      */
     fun createBillingPortalConfiguration(privacyPolicyUrl: String, tosUrl: String): String
 
     /* ### PRODUCT ### */
     /** Check if a product exists in the monetization provider.
+     *
+     * Context: When a plan is given monetization information. This is used to check if the product already exists in the monetization provider.
+     * If the product exists, it's prices will be updated, otherwise the product will be created.
+     * @see createProduct
+     * @see updateProduct
+     *
      * @param productIntegrationId The integration ID of the product as it appears in the monetization provider.
      * @return True if the product exists, false otherwise.
      */
@@ -135,9 +152,16 @@ interface Monetization {
      * @param name The name of the product.
      * @param description The description of the product.
      * @param imageUrl The URL to the image of the product.
+     *
+     * Context: A plan on the Apiable infrastructure is given monetization information. This is used to create a product in the monetization provider.
+     * An Apiable plan object should have one-to-one relationship with a monetization product.
+     *
+     * A product should contain at least one price.
+     *
      * @return The product object, including the integration ID of the product--the ID of the product in the monetization provider.
      * The integration ID will be stored in the Apiable database and used to reference the product in the monetization provider.
      * @see MonetizationProduct
+     * @see createPrice
      */
     fun createProduct(
         planId: String,
@@ -151,6 +175,9 @@ interface Monetization {
      * @param name The new name of the product.
      * @param description The new description of the product.
      * @param imageUrl The new URL to the image of the product.
+     *
+     * Context: A plan is edited and it's information is changed in the Apiable infrastructure.
+     *
      * @return The updated product object.
      */
     fun updateProduct(
@@ -159,6 +186,7 @@ interface Monetization {
         description: String,
         imageUrl: String
     ): MonetizationProduct
+
     /** Get a product from the monetization provider.
      * @param productIntegrationId The integration ID of the product as it appears in the monetization provider.
      * @return The product object.
@@ -168,9 +196,10 @@ interface Monetization {
     /* ### PRICE ### */
     /** Create a price in the monetization provider.
      * @param priceData The data for the price.
-     * @see BillingPriceCreate
+     *
      * @return The price object, including the integration ID of the price--the ID of the price in the monetization provider.
      * The integration ID will be stored in the Apiable database and used to reference the price in the monetization provider.
+     * @see BillingPriceCreate
      * @see BillingPrice
      */
     fun getPriceById(priceIntegrationId: String): BillingPrice
@@ -184,6 +213,10 @@ interface Monetization {
 
     /** Check if a lookup key is used.
      * @param lookupKey The lookup key to check.
+     *
+     * Context: Used when creating/updating Apiable plans.
+     * This is used to check if the lookup key is already used in the monetization provider.
+     *
      * @return True if the lookup key is used, false otherwise.
      */
     fun isLookupKeyUsed(lookupKey: String): Boolean
@@ -194,6 +227,10 @@ interface Monetization {
      * @param monetizationProductId The ID of the product for which the subscription is created.
      * @param monetizationPriceIds The IDs of the prices for the subscription.
      * @param monetizationCustomerId The ID of the customer for which the subscription is created.
+     *
+     * Context: When a user wants to create a subscription on the Apiable portal, a checkout link is created.
+     * The user is redirected to the checkout link to complete the subscription securely.
+     *
      * @return The checkout session object, including the ID of the checkout session in the monetization provider.
      * The checkout session ID will be stored in the Apiable database and used to reference the checkout session in the monetization provider.
      * @see MonetizationCheckoutSession
@@ -206,13 +243,22 @@ interface Monetization {
     ): MonetizationCheckoutSession?
 
     /** Expires a checkout session link.
+     *
+     * Context: Triggered when the user returns from checkout session without completing the subscription.
+     * In most cases the earlier checkout session can be returned to and completed. But if a new checkout session is created, the old one should be expired to prevent double-checkout.
+     *
      * @param checkoutSessionId The ID of the checkout session to expire.
      */
     fun expireCheckoutSession(checkoutSessionId: String)
 
     /** Check if the customer can create a subscription with the given currency.
-     * Payment providers might not allow one customer to have multiple subscriptions with different currencies.
+     *
+     * Context: Payment providers might not allow one customer to have multiple subscriptions with different currencies.
      * This function is always called before subscription is created.
+     * If the customer can't create a subscription with the given currency, the subscription creation is prevented.
+     *
+     * In case payment provider does not support multiple currencies, this function should always return true.
+     *
      * @param customerIntegrationId The ID of the customer.
      * @param currency The currency to check.
      * @return True if the customer can create a subscription with the given currency, false otherwise.
@@ -220,28 +266,47 @@ interface Monetization {
     fun canCreateSubscriptionWithCurrency(customerIntegrationId: String, currency: String): Boolean
 
     /** Get a subscription from the monetization provider and return the timestamp of the next invoice.
-     * This information is used to show the next invoice date to the user on the portal
+     *
+     * Context: This information is used to show the next invoice date to the user on the portal
+     *
      * @param subscriptionIntegrationId The ID of the subscription.
      * @return The timestamp of the next invoice date.
      */
     fun findNextInvoiceDateForSubscription(subscriptionIntegrationId: String): Long?
 
     /** List all invoices that have been generated for a subscription.
-     * This information will be shown to the user on the portal.
+     *
+     * Context: This information will be shown to the user on the portal.
+     *
      * @param subscriptionIntegrationId The ID of the subscription.
      * @return The list of invoices.
      */
     fun findSubscriptionInvoices(subscriptionIntegrationId: String): List<MonetizationInvoice>
 
     /** Refresh the state of the subscription from the payment provider.
+     *
+     * Context: Most of the time the state of the subscription is updated in the background by webhooks.
+     * However, network errors can happen, and the state of the subscription should be able to be manually refreshed.
+     *
+     * Alternatively, if webhooks are not set up, or are not supported by the payment provider, the state of the subscription should be manually refreshed.
+     *
      * @param subscriptionIntegrationId The ID of the subscription.
      * @return The subscription object containing the updated states from the payment provider.
      * The updated data will be processed and reflected on the Apiable subscription object.
+     *
+     * @see refreshSubscriptionByCheckoutId in case the integration ID of the subscription is missing.
      */
     fun refreshSubscriptionById(subscriptionIntegrationId: String): MonetizationSubscription
 
     /** Refresh the state of the subscription from the payment provider.
      * This function is only used when the state of the subscription has to be validated and the integration ID of the subscription is missing.
+     * @see refreshSubscriptionById in case the integration ID of the subscription is available.
+     *
+     * Context: Most of the time the state of the subscription is updated in the background by webhooks.
+     * However, network errors can happen, and the state of the subscription should be able to be manually refreshed.
+     *
+     * Alternatively, if webhooks are not set up, or are not supported by the payment provider, the state of the subscription should be manually refreshed.
+     *
      * @param checkoutSessionId ID of checkout session used with the subscription.
      * @return The subscription object containing the updated states from the payment provider.
      * The updated data will be processed and reflected on the Apiable subscription object.
@@ -249,13 +314,20 @@ interface Monetization {
     fun refreshSubscriptionByCheckoutId(checkoutSessionId: String): MonetizationSubscription
 
     /** Cancel a subscription in the monetization provider.
+     *
+     * Context: When the user cancels their subscription on the Apiable portal, the subscription is cancelled in the monetization provider.
+     * By default, it is assumed that subscriptions are cancelled at the end of their current billing period.
+     *
      * @param subscriptionIntegrationId The ID of the subscription to cancel.
-     * @param immediately True if the subscription should be cancelled immediately, false if the subscription should be cancelled at the end of the current period.
+     * @param immediately True if the subscription should be cancelled immediately, false if the subscription should be cancelled at the end of the current period. Default is false if no value is provided.
      * @return True if the subscription was successfully cancelled, false otherwise.
      */
     fun cancelSubscription(subscriptionIntegrationId: String, immediately: Boolean): Boolean
 
     /** Update subscription so that it points to a different product
+     *
+     * Context: User changes the plan their subscription on the Apiable portal.
+     *
      * @param subscriptionIntegrationId The ID of the subscription in the monetization provider to update.
      * @param productIntegrationId The payment provider ID of the product to which the subscription should belong to.
      * @return True if the subscription was successfully updated, false otherwise.
@@ -263,6 +335,9 @@ interface Monetization {
     fun updateSubscription(subscriptionIntegrationId: String, productIntegrationId: String): Boolean
 
     /** Report metered usage
+     *
+     * Context: Used to report usage for metered billing.
+     *
      * @param subscriptionId The ID of the subscription to report usage for.
      * @param quantity The quantity of the usage to report
      * @param timestamp The timestamp of the usage in unix seconds.
@@ -278,18 +353,25 @@ interface Monetization {
         lookupKey: String?
     ): SubscriptionUsageReport?
 
-    // TODO: Implement usage as generic wrapper.
+    // TODO: Additional work to be done on generic usage reporting
     fun getMeteredUsageSummary(subscriptionId: String): List<StripeSubscriptionUsageItem>?
     fun getMeteredUsageSummaryForSubscriptionItem(subscriptionItemId: String): StripeSubscriptionUsageItem
 
 
     /** create a price in the billing provider
+     *
+     * Context: Plan monetization is changed, and no previous price exists.
+     *
      * @param priceData The data for the price.
      * @see BillingPriceCreate
      */
     fun createPrice(priceData: BillingPriceCreate):BillingPrice
+
     /** Update a price in the billing provider. For a lot of providers, prices are immutable for large parts.
      *  Common work-around is to de-activate the old price for new purchases, and create a new price.
+     *
+     *  Context: Plan monetization is changed, and a previous price exists.
+     *
      *  @param integrationId The id of the price to update.
      *  @param priceData The new price data.
      *  @return The updated price that will be used for new subscriptions.
