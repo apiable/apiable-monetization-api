@@ -356,6 +356,7 @@ interface Monetization {
     // TODO: Additional work to be done on generic usage reporting
     fun getMeteredUsageSummary(subscriptionId: String): List<StripeSubscriptionUsageItem>?
     fun getMeteredUsageSummaryForSubscriptionItem(subscriptionItemId: String): StripeSubscriptionUsageItem
+    fun getMeteredUsageTotal(subscriptionId: String): Long
 
 
     /** create a price in the billing provider
