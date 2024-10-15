@@ -74,6 +74,11 @@ interface Monetization {
      */
     fun getAccountStatus(): MonetizationAccountStatus
 
+    /** Perform the necessary steps to unlink the account on the payment provider side. Or mark that the account has been unlinked.
+     * Context: Called when user clicks "unlink payment provider" on the Apiable Portal management Dashboard.
+     */
+    fun unlinkAccount()
+
     /** Returns the URL to the external dashboard login page for the account.
      *
      * If payment provider hosted account dashboard is not applicable in the provider, this function should return an empty string.
