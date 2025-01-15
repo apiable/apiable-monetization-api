@@ -27,6 +27,11 @@ data class MonetizationVolumeTier(
     val flatFee: Double
 )
 
+/**
+ * Represents a price for a product
+ * @param amount The amount of the price in cents or smallest currency unit (e.g. 100 cents for 1 USD)
+ * @param amountDouble The amount of the price as a double in the currency's standard unit (e.g. 1.0 for 1 USD)
+ */
 interface BillingPrice {
     val revenueModel: RevenueModel
     val cycle:BillingCycle
@@ -39,6 +44,7 @@ interface BillingPrice {
     val includeTax: Boolean
 
     val amount: Long?
+    val amountDouble: Double?
     val priceTiers: List<MonetizationVolumeTier>?
     val meteringIntegrationId: String?
     val linkedPriceIds: List<String>?
