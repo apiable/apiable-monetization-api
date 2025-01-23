@@ -21,6 +21,11 @@ data class MonetizationCheckoutSession(
     val id: String,
     val url: String,
 )
+
+/**
+ * @param total The total amount of the invoice as a long in it's smallest units (e.g. 1000 cents)
+ * @param totalDouble The total amount of the invoice as a double in standard units (e.g. 10.00 €)  (optional, but recommended as it has higher precedence to be shown on the UI.)
+ */
 data class MonetizationInvoice(
     val id: String,
     val subscription: String,
@@ -33,6 +38,7 @@ data class MonetizationInvoice(
     val dueDate: Long? = null,
     val status: String,
     val total: Long,
+    val totalDouble: Double? = null,
     val hostedUrl: String
 )
 data class SubscriptionUsageReport(
@@ -383,4 +389,11 @@ interface Monetization {
      *  @return The updated price that will be used for new subscriptions.
      */
     fun updatePrice(integrationId: String, priceData: BillingPriceCreate): BillingPrice
+
+    /** Retrieve a list of allowed currencies that will be shown on the dashboard.
+     * If only one currency is allowed, the currency will be preselected and not shown on the dashboard.
+     * The default currency is assumed to be the first one in the list.
+     * @return List<String>
+     * */
+    fun retrieveCurrencyOptions(): List<String>
 }
