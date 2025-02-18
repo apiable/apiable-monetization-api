@@ -343,7 +343,7 @@ interface Monetization {
      * @param productIntegrationId The payment provider ID of the product to which the subscription should belong to.
      * @return True if the subscription was successfully updated, false otherwise.
      */
-    fun updateSubscription(subscriptionIntegrationId: String, productIntegrationId: String): Boolean
+    fun updateSubscription(subscriptionIntegrationId: String, billingPrice: BillingPrice): Boolean
 
     /** Report metered usage
      *
