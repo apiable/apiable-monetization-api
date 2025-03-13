@@ -263,7 +263,12 @@ interface Monetization {
      */
     fun expireCheckoutSession(checkoutSessionId: String)
 
-    // TODO
+    /**
+     * Retrieves the checkout session associated with the given checkout session ID.
+     *
+     * @param checkoutSessionId The unique identifier of the checkout session to be retrieved.
+     * @return A [MonetizationCheckoutSession] object if the session exists, or null if no session is found.
+     */
     fun getCheckoutSession(checkoutSessionId: String): MonetizationCheckoutSession?
 
     /** Check if the customer can create a subscription with the given currency.
