@@ -19,6 +19,7 @@ import io.apiable.monetization.adapter.model.*
 
 data class MonetizationCheckoutSession(
     val id: String,
+    val subscriptionId: String? = null,
     val url: String,
 )
 
@@ -261,6 +262,14 @@ interface Monetization {
      * @param checkoutSessionId The ID of the checkout session to expire.
      */
     fun expireCheckoutSession(checkoutSessionId: String)
+
+    /**
+     * Retrieves the checkout session associated with the given checkout session ID.
+     *
+     * @param checkoutSessionId The unique identifier of the checkout session to be retrieved.
+     * @return A [MonetizationCheckoutSession] object if the session exists, or null if no session is found.
+     */
+    fun getCheckoutSession(checkoutSessionId: String): MonetizationCheckoutSession?
 
     /** Check if the customer can create a subscription with the given currency.
      *
