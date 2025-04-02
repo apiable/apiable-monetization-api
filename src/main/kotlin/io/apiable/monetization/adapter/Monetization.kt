@@ -1,6 +1,7 @@
 package io.apiable.monetization.adapter
 
 import io.apiable.monetization.adapter.model.*
+import java.time.LocalDateTime
 
 /**
 * Apiable Oy
@@ -340,9 +341,10 @@ interface Monetization {
      *
      * @param subscriptionIntegrationId The ID of the subscription to cancel.
      * @param immediately True if the subscription should be cancelled immediately, false if the subscription should be cancelled at the end of the current period. Default is false if no value is provided.
+     * @param dateTime Optional parameter to specify the datetime when the subscription should be cancelled. Defaults to end of current billing period if not specified, and 'immediately' is set to false. This should be ignored if immediately is set to true.
      * @return True if the subscription was successfully cancelled, false otherwise.
      */
-    fun cancelSubscription(subscriptionIntegrationId: String, immediately: Boolean): Boolean
+    fun cancelSubscription(subscriptionIntegrationId: String, immediately: Boolean, dateTime: LocalDateTime? = null): Boolean
 
     /** Update subscription so that it points to a different product
      *
