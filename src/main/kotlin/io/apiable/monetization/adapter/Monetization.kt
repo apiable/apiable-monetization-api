@@ -375,11 +375,7 @@ interface Monetization {
         lookupKey: String?
     ): SubscriptionUsageReport?
 
-    // TODO: Additional work to be done on generic usage reporting
-    fun getMeteredUsageSummary(subscriptionId: String): List<StripeSubscriptionUsageItem>?
-    fun getMeteredUsageSummaryForSubscriptionItem(subscriptionItemId: String): StripeSubscriptionUsageItem
     fun getMeteredUsageTotal(subscriptionId: String): Long
-
 
     /** create a price in the billing provider
      *
@@ -407,4 +403,32 @@ interface Monetization {
      * @return List<String>
      * */
     fun retrieveCurrencyOptions(): List<String>
+
+
+
+    // Credit packs
+    /**
+     * @param customerIntegrationId Integration ID of the customer to create credit invoice for.
+     * @param amount Amount of credit to invoice for, marked in the smallest denomination of the given currency.
+     * @param currency Currency of the credit to be invoiced.
+     */
+    fun createCreditPackInvoice(customerIntegrationId: String, amount: Long, currency: String): String
+    fun checkoutCreditPack(customerIntegrationId: String, priceIntegrationId: String): String
+    fun fulfillCreditPackCheckout(checkoutSessionId: String): String?
+
+    fun retrieveInvoice(invoiceId: String):MonetizationInvoiceResponse?
+
+    fun retrieveCreditBalances(customerIntegrationId: String): List<Balances>?
+
+
+    // Credit packs
+    /** Grants credit to customer. Ensure that you have billed the customer before or during this method.
+     * @param customerIntegrationId Integration ID of the customer to create credit invoice for.
+     * @param amount Amount of credit to invoice for, marked in the smallest denomination of the given currency.
+     * @param currency Currency of the credit to be invoiced.
+     * @param checkoutSessionId Optional ID of the checkout session that should be tied to this credit grant.
+     */
+    fun grantCreditToCustomer(customerIntegrationId: String, amount: Long, currency: String, checkoutSessionId: String?=null): String
+
+    fun listCreditGrants(customerIntegrationId: String, limit: Long, before: String?=null, after: String?=null): List<CreditGrant>
 }
