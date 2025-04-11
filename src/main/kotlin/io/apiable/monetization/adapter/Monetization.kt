@@ -419,7 +419,8 @@ interface Monetization {
     fun retrieveInvoice(invoiceId: String):MonetizationInvoiceResponse?
 
     fun retrieveCreditBalances(customerIntegrationId: String): List<Balances>?
-
+    fun checkCreditAboveThreshold(customerIntegrationId: String, threshold: Long, currency: String): Boolean
+    fun previewMeteredInvoiceTotals(customerIntegrationId: String): Long
 
     // Credit packs
     /** Grants credit to customer. Ensure that you have billed the customer before or during this method.
