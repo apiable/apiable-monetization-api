@@ -408,6 +408,11 @@ interface Monetization {
      * */
     fun retrieveCurrencyOptions(): List<String>
 
+    /** Retrieves the default currency for a user.
+     *  The currency will be shown as default when multiple currencies are present.
+     */
+    fun retrieveUserDefaultCurrency(userIntegrationId: String): String?
+
     fun createInvoice(customerIntegrationId: String, amount: Long, currency: String, description: String, metadata: Map<String,String>): String
     fun retrieveInvoice(integrationId: String): MonetizationInvoice?
 }
