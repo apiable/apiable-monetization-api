@@ -120,6 +120,9 @@ interface Monetization {
      */
     fun createUser(email: String, name: String): MonetizationCustomer
 
+    fun findUserByEmail(email: String): List<MonetizationCustomer>?
+    fun findUserSubscriptions(integrationId: String): List<MonetizationSubscriptionSearch>?
+
     /** Returns a link to the end user billing portal where the end user can view and manage their subscription.
      * Only applicable if the end-user billing portal is relevant for the monetization provider.
      *
