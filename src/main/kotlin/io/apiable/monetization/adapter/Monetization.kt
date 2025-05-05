@@ -120,7 +120,17 @@ interface Monetization {
      */
     fun createUser(email: String, name: String): MonetizationCustomer
 
+    /** Finds and returns any users from the payment provider that are associated with a specific email.
+     * This function is used to list users that might not have been properly linked together between Apiable and the payment provider.
+     * @param email The email of the user
+     */
     fun findUserByEmail(email: String): List<MonetizationCustomer>?
+
+    /** Finds and lists all subscriptions from the payment provider that belong to this particular user.
+     * This function is used to list subscriptions that might not have been correctly linked between Apiable and the payment provider.
+     * @param integrationId integration ID of the user in the payment provider. E.g `cus_aabbcc...`
+     *
+     */
     fun findUserSubscriptions(integrationId: String): List<MonetizationSubscriptionSearch>?
 
     /** Returns a link to the end user billing portal where the end user can view and manage their subscription.
