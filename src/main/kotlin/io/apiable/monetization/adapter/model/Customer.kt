@@ -20,6 +20,12 @@ data class MonetizationCustomer(
     val email: String,
     val currency: String = "NONE",
 )
+data class MonetizationSubscriptionSearch(
+    val integrationId: String,
+    val prices: List<String>,
+    val status: String,
+    val currency: String = "NONE",
+)
 
 data class MonetizationCustomerCreate(
     val name: String,
