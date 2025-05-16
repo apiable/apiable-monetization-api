@@ -15,10 +15,10 @@ package io.apiable.monetization.adapter.model
  */
 
 enum class BillingCycle {
-    MONTH, YEAR, MONTHLY, YEARLY
+    MONTH, YEAR, MONTHLY, YEARLY, NONE
 }
 enum class RevenueModel {
-    ONETIME, RECURRING, FLAT_FEE, GRADUATED, VOLUME, FREE, CONTRACT, FLAT_FEE_OVERAGE
+    ONETIME, RECURRING, FLAT_FEE, GRADUATED, VOLUME, FREE, CONTRACT, FLAT_FEE_OVERAGE, PREPAID_BURN_DOWN
 }
 data class MonetizationVolumeTier(
     val min: Double,

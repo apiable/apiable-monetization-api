@@ -30,7 +30,7 @@ data class MonetizationCheckoutSession(
  */
 data class MonetizationInvoice(
     val id: String,
-    val subscription: String,
+    val subscription: String? = null,
     val customer: String,
     val amountDue: Long,
     val amountPaid: Long,
@@ -420,4 +420,12 @@ interface Monetization {
      * @return List<String>
      * */
     fun retrieveCurrencyOptions(): List<String>
+
+    /** Retrieves the default currency for a user.
+     *  The currency will be shown as default when multiple currencies are present.
+     */
+    fun retrieveUserDefaultCurrency(userIntegrationId: String): String?
+
+    fun createInvoice(customerIntegrationId: String, amount: Long, currency: String, description: String, metadata: Map<String,String>): String
+    fun retrieveInvoice(integrationId: String): MonetizationInvoice?
 }
