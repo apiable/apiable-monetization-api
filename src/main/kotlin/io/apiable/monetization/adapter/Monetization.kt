@@ -30,6 +30,7 @@ data class MonetizationCheckoutSession(
  */
 data class MonetizationInvoice(
     val id: String,
+    val invoiceNumber: String,
     val subscription: String? = null,
     val customer: String,
     val amountDue: Long,
@@ -428,4 +429,5 @@ interface Monetization {
 
     fun createInvoice(customerIntegrationId: String, amount: Long, currency: String, description: String, metadata: Map<String,String>): String
     fun retrieveInvoice(integrationId: String): MonetizationInvoice?
+    fun searchInvoices(search: String): List<MonetizationInvoice>?
 }
