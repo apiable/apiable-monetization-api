@@ -430,4 +430,5 @@ interface Monetization {
     fun createInvoice(customerIntegrationId: String, amount: Long, currency: String, description: String, metadata: Map<String,String>): String
     fun retrieveInvoice(integrationId: String): MonetizationInvoice?
     fun searchInvoices(search: String): List<MonetizationInvoice>?
+    fun voidInvoice(integrationId: String): Boolean
 }
