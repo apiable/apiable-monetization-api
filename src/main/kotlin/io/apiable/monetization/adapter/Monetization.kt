@@ -53,6 +53,19 @@ data class SubscriptionUsageReport(
     val rawEventJson: Any,
 )
 
+data class SubscriptionUsageSummaryItem(
+    val aggregateSum: Int,
+    val startTime: Long,
+    val endTime: Long,
+)
+data class SubscriptionUsageSummary(
+    val subscriptionId: String,
+    val meterId: String,
+    val periodStartTime: Long,
+    val periodEndTime: Long,
+    val items: List<SubscriptionUsageSummaryItem?>,
+)
+
 interface Monetization {
 
     /* ### ACCOUNT ### */
@@ -389,8 +402,7 @@ interface Monetization {
         lookupKey: String?
     ): SubscriptionUsageReport?
 
-    // TODO: Additional work to be done on generic usage reporting
-    fun getMeteredUsageSummary(subscriptionId: String): List<StripeSubscriptionUsageItem>?
+    fun getMeteredUsageSummary(subscriptionIntegrationId: String, meterId: String): SubscriptionUsageSummary?
     fun getMeteredUsageSummaryForSubscriptionItem(subscriptionItemId: String): StripeSubscriptionUsageItem
     fun getMeteredUsageTotal(subscriptionId: String): Long
 
