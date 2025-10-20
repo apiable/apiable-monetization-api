@@ -42,7 +42,12 @@ data class MonetizationInvoice(
     val status: String,
     val total: Long,
     val totalDouble: Double? = null,
-    val hostedUrl: String
+    val hostedUrl: String,
+    val apiableSubscriptionId: String? = null,
+    val apiableUserId: String? = null,
+    val apiablePlanId: String? = null,
+    val apiableProductId: String? = null,
+    val apiableTeamId: String? = null,
 )
 data class SubscriptionUsageReport(
     val subscriptionId: String,
@@ -443,4 +448,6 @@ interface Monetization {
     fun retrieveInvoice(integrationId: String): MonetizationInvoice?
     fun searchInvoices(search: String): List<MonetizationInvoice>?
     fun voidInvoice(integrationId: String): Boolean
+
+    fun retrieveRecentInvoices(limit: Number, after: Long?=null, cursorAfter: String?=null, status: String?=null): List<MonetizationInvoice>
 }
