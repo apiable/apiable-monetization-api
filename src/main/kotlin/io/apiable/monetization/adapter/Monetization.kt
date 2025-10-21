@@ -42,7 +42,12 @@ data class MonetizationInvoice(
     val status: String,
     val total: Long,
     val totalDouble: Double? = null,
-    val hostedUrl: String
+    val hostedUrl: String,
+    val apiableSubscriptionId: String? = null,
+    val apiablePlanId: String? = null,
+    val apiableProductId: String? = null,
+    val apiableTeamId: String? = null,
+    val apiableUserId: String? = null,
 )
 data class SubscriptionUsageReport(
     val subscriptionId: String,
