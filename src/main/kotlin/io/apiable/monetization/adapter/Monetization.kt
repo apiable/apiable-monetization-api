@@ -443,4 +443,9 @@ interface Monetization {
     fun retrieveInvoice(integrationId: String): MonetizationInvoice?
     fun searchInvoices(search: String): List<MonetizationInvoice>?
     fun voidInvoice(integrationId: String): Boolean
+
+    /**
+     * Retrieve recent invoices with optional filters.
+     */
+    fun retrieveRecentInvoices(limit: Number, after: Long?=null, cursorAfter: String?=null, status: String?=null): List<MonetizationInvoice>
 }
