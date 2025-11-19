@@ -284,7 +284,9 @@ interface Monetization {
         returnUrlBase: String,
         monetizationProductId: String,
         monetizationPriceIds: List<String>,
-        monetizationCustomerId: String
+        monetizationCustomerId: String,
+        apiableTeamId: String? = "",
+        apiableSubscriptionId: String? = ""
     ): MonetizationCheckoutSession?
 
     /** Expires a checkout session link.
