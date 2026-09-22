@@ -272,6 +272,8 @@ interface Monetization {
      * @param monetizationProductId The ID of the product for which the subscription is created.
      * @param monetizationPriceIds The IDs of the prices for the subscription.
      * @param monetizationCustomerId The ID of the customer for which the subscription is created.
+     * @param taxChoiceRecorded True when every price of the plan carries an explicit tax choice.
+     * Automatic tax is only considered for such plans, so plans that predate the choice keep their behaviour.
      *
      * Context: When a user wants to create a subscription on the Apiable portal, a checkout link is created.
      * The user is redirected to the checkout link to complete the subscription securely.
@@ -286,7 +288,8 @@ interface Monetization {
         monetizationPriceIds: List<String>,
         monetizationCustomerId: String,
         apiableTeamId: String? = "",
-        apiableSubscriptionId: String? = ""
+        apiableSubscriptionId: String? = "",
+        taxChoiceRecorded: Boolean = false
     ): MonetizationCheckoutSession?
 
     /** Expires a checkout session link.
