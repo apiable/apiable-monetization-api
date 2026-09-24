@@ -24,6 +24,32 @@ data class MonetizationCheckoutSession(
     val url: String,
 )
 
+/** How far the provider can place a customer for tax. */
+enum class TaxLocationStatus {
+    /** Tax can be calculated, including where no tax is due. */
+    KNOWN,
+    /** The provider cannot place the address the customer gave. The customer must give it again. */
+    UNRECOGNIZED,
+    /** The provider could not decide. It is usually temporary, so the caller tries again later. */
+    FAILED,
+}
+
+/**
+ * The tax setup of the connected account, as the provider reports it.
+ *
+ * @property status `active`, `pending`, or `unknown` when it could not be read.
+ * @property missingFields What the account still needs before tax can be collected, while `pending`.
+ * @property registrationCountries The countries where the account has an active tax registration.
+ */
+data class MonetizationTaxSettings(
+    val status: String,
+    val missingFields: List<String> = emptyList(),
+    val headOfficeCountry: String? = null,
+    val defaultTaxBehavior: String? = null,
+    val defaultTaxCode: String? = null,
+    val registrationCountries: List<String> = emptyList(),
+)
+
 /**
  * @param total The total amount of the invoice as a long in it's smallest units (e.g. 1000 cents)
  * @param totalDouble The total amount of the invoice as a double in standard units (e.g. 10.00 €)  (optional, but recommended as it has higher precedence to be shown on the UI.)
@@ -272,6 +298,8 @@ interface Monetization {
      * @param monetizationProductId The ID of the product for which the subscription is created.
      * @param monetizationPriceIds The IDs of the prices for the subscription.
      * @param monetizationCustomerId The ID of the customer for which the subscription is created.
+     * @param collectTax True when the plan has tax collection turned on. Automatic tax is only considered
+     * for such plans, so every other plan keeps its untaxed checkout.
      *
      * Context: When a user wants to create a subscription on the Apiable portal, a checkout link is created.
      * The user is redirected to the checkout link to complete the subscription securely.
@@ -286,7 +314,56 @@ interface Monetization {
         monetizationPriceIds: List<String>,
         monetizationCustomerId: String,
         apiableTeamId: String? = "",
-        apiableSubscriptionId: String? = ""
+        apiableSubscriptionId: String? = "",
+        collectTax: Boolean = false
+    ): MonetizationCheckoutSession?
+
+    /** Whether the connected account can collect tax at checkout.
+     *
+     * Context: A plan change onto a plan that collects tax needs a new checkout when the subscription
+     * was created without tax. This tells whether tax would apply at all.
+     *
+     * @return True if tax collection is active on the account, false otherwise.
+     * @throws RuntimeException if the setting cannot be read. The caller must not guess the answer.
+     */
+    fun isTaxCollectionActive(): Boolean
+
+    /** The tax setup of the connected account, read fresh from the provider.
+     *
+     * Context: shown to the tenant, so they can see whether plans that collect tax will charge it.
+     */
+    fun getTaxSettings(): MonetizationTaxSettings
+
+    /** Whether the provider collects tax on the invoices of a subscription.
+     *
+     * @param subscriptionIntegrationId The ID of the subscription.
+     * @return True if the subscription's invoices are taxed automatically.
+     */
+    fun isSubscriptionTaxed(subscriptionIntegrationId: String): Boolean
+
+    /** Whether the provider knows enough about the location of a subscription's customer to calculate tax.
+     *
+     * Context: tax can be switched on for an existing subscription only when the customer's location is known.
+     *
+     * @param subscriptionIntegrationId The ID of the subscription whose customer is checked.
+     * @return [TaxLocationStatus.KNOWN] if tax can be calculated for the customer, including where no tax is due.
+     */
+    fun taxLocationStatus(subscriptionIntegrationId: String): TaxLocationStatus
+
+    /** Create a hosted checkout that collects the location and payment details of a subscription's customer,
+     * without charging and without creating a subscription.
+     *
+     * Context: a plan change onto a plan that collects tax waits until the customer's location is known.
+     *
+     * @param returnUrlBase The base URL to which the user will be redirected after the checkout.
+     * @param subscriptionIntegrationId The ID of the subscription whose customer and currency are used.
+     * @param apiableSubscriptionId The Apiable subscription, stored on the checkout for the webhook.
+     * @return The checkout session.
+     */
+    fun taxLocationCheckout(
+        returnUrlBase: String,
+        subscriptionIntegrationId: String,
+        apiableSubscriptionId: String,
     ): MonetizationCheckoutSession?
 
     /** Expires a checkout session link.
@@ -386,9 +463,10 @@ interface Monetization {
      *
      * @param subscriptionIntegrationId The ID of the subscription in the monetization provider to update.
      * @param productIntegrationId The payment provider ID of the product to which the subscription should belong to.
+     * @param collectTax Whether the provider collects tax on the subscription after the change. Null leaves it as it is.
      * @return True if the subscription was successfully updated, false otherwise.
      */
-    fun updateSubscription(subscriptionIntegrationId: String, billingPrice: BillingPrice): Boolean
+    fun updateSubscription(subscriptionIntegrationId: String, billingPrice: BillingPrice, collectTax: Boolean? = null): Boolean
 
     /** Report metered usage
      *

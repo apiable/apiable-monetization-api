@@ -41,7 +41,8 @@ interface BillingPrice {
     val currency: String
     val recurring: Boolean
     val lookupKey: String?
-    val includeTax: Boolean
+    /** true: tax inclusive, false: tax exclusive, null: the provider's account default applies. */
+    val includeTax: Boolean?
 
     val amount: Long?
     val amountDouble: Double?
@@ -56,7 +57,7 @@ data class BillingPriceCreate (
     val productIntegrationId: String,
     val currency: String,
     val recurring: Boolean,
-    val includeTax: Boolean = false,
+    val includeTax: Boolean? = null,
     val lookupKey: String? = null,
 
     val amount: Long? = null,
