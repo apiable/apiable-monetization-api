@@ -477,6 +477,7 @@ interface Monetization {
      * @param timestamp The timestamp of the usage in unix seconds.
      * @param setInsteadOfIncrement True if the quantity should be set instead of incremented.
      * @param lookupKey The lookup key of the price to report usage for. If null, the usage will be reported through subscription defaults.
+     * @param identifier The caller's unique key for this report. A repeat with the same key is counted once. If null, every report counts.
      * @return The usage report object
      */
     fun reportMeteredUsage(
@@ -484,7 +485,8 @@ interface Monetization {
         quantity: Long,
         timestamp: Long,
         setInsteadOfIncrement: Boolean,
-        lookupKey: String?
+        lookupKey: String?,
+        identifier: String? = null,
     ): SubscriptionUsageReport?
 
     fun getMeteredUsageSummary(subscriptionIntegrationId: String, meterId: String): SubscriptionUsageSummary?
