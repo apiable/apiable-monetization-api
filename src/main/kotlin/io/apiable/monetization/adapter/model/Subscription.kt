@@ -21,6 +21,8 @@ data class MonetizationSubscription(
     val integrationId: String,
     val currentPeriodEnd: Long,
     val status: MonetizationSubscriptionStatus,
+    /** The currency the provider bills the subscription in, lower case. It is fixed once billing starts. */
+    val currency: String? = null,
 )
 data class StripeSubscriptionUsageItem(
     val subscriptionitemId: String,
